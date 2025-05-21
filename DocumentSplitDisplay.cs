@@ -11,67 +11,55 @@ public class DocumentSplitDisplay : MonoBehaviour
     public GameObject documentUIPrefab;
 
     [Header("마스크 영역")]
-    public RectTransform leftMask;    // 좌측 책상
-    public RectTransform rightMask;   // 우측 책상
-    public RectTransform personArea;  // 인물이 문서를 건네주는 위치
+    public RectTransform leftMask;
+    public RectTransform rightMask;
+    public RectTransform personArea;
 
     private GameObject leftDocUI;
-    private GameObject rightDocUI;
+
+    private DocumentData cachedData;
 
     public void InitializeDocument(DocumentData data)
     {
-        // 좌측 문서 UI 생성
+        cachedData = data;
+
+        // 좌측 문서 UI만 생성
         leftDocUI = Instantiate(documentUIPrefab, leftMask);
-        DocumentUIController leftController = leftDocUI.GetComponent<DocumentUIController>();
-        leftController.SetData(data);
-        leftController.SetScale(0.7f); // 축소된 상태
+        DocumentUIController controller = leftDocUI.GetComponent<DocumentUIController>();
+        controller.SetData(data);
+        controller.SetScale(0.7f); // 축소
 
-        // 우측 문서 UI 생성
-        rightDocUI = Instantiate(documentUIPrefab, rightMask);
-        DocumentUIController rightController = rightDocUI.GetComponent<DocumentUIController>();
-        rightController.SetData(data);
-        rightController.SetScale(1.2f); // 확대된 상태
-
-        // 드래그 허용 영역 설정
-        UIDragHandler leftDrag = leftDocUI.GetComponent<UIDragHandler>();
-        UIDragHandler rightDrag = rightDocUI.GetComponent<UIDragHandler>();
-
-        if (leftDrag != null)
+        UIDragHandler dragHandler = leftDocUI.GetComponent<UIDragHandler>();
+        if (dragHandler != null)
         {
-            leftDrag.validAreas = new RectTransform[] { leftMask, rightMask, personArea };
+            dragHandler.validAreas = new RectTransform[] { leftMask, rightMask, personArea };
         }
 
-        if (rightDrag != null)
-        {
-            rightDrag.validAreas = new RectTransform[] { leftMask, rightMask, personArea };
-        }
-
-        // 시작 애니메이션 실행
-        StartCoroutine(AnimateGiveDocument(from: personArea.anchoredPosition, to: leftMask.anchoredPosition));
+        // 초기 위치를 숨긴 영역(인물 손)으로 설정
+        RectTransform leftRect = leftDocUI.GetComponent<RectTransform>();
+        leftRect.anchoredPosition = personArea.anchoredPosition;
     }
 
-    // 문서를 인물 위치에서 책상 위치로 이동시키는 애니메이션
-    public IEnumerator AnimateGiveDocument(Vector2 from, Vector2 to, float duration = 0.5f)
+    public void AnimateGiveDocument(float duration = 0.5f)
     {
-        RectTransform leftRect = leftDocUI.GetComponent<RectTransform>();
-        RectTransform rightRect = rightDocUI.GetComponent<RectTransform>();
+        StartCoroutine(AnimateMoveToDesk(duration));
+    }
 
-        // 처음 위치 설정
-        leftRect.anchoredPosition = from;
-        rightRect.anchoredPosition = from;
+    private IEnumerator AnimateMoveToDesk(float duration)
+    {
+        RectTransform docRect = leftDocUI.GetComponent<RectTransform>();
+        Vector2 from = personArea.anchoredPosition;
+        Vector2 to = Vector2.zero;
 
         float timer = 0f;
         while (timer < duration)
         {
             timer += Time.deltaTime;
             float t = Mathf.SmoothStep(0, 1, timer / duration);
-            leftRect.anchoredPosition = Vector2.Lerp(from, to, t);
-            rightRect.anchoredPosition = Vector2.Lerp(from, to, t);
+            docRect.anchoredPosition = Vector2.Lerp(from, to, t);
             yield return null;
         }
 
-        // 최종 위치 고정
-        leftRect.anchoredPosition = to;
-        rightRect.anchoredPosition = to;
+        docRect.anchoredPosition = to;
     }
 }

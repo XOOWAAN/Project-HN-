@@ -44,19 +44,27 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         rectTransform.anchoredPosition = pos;
     }
 
-    // 드래그 종료 시 호출됨
     public void OnEndDrag(PointerEventData eventData)
     {
-        // 현재 위치가 허용된 영역 안이면 그 위치를 유효 위치로 기록
         if (IsInValidArea(rectTransform))
         {
             lastValidPosition = rectTransform.anchoredPosition;
+
+            // 확대/축소 처리
+            if (RectTransformUtility.RectangleContainsScreenPoint(validAreas[1], Input.mousePosition)) // 우측
+                SetScale(1.2f);
+            else if (RectTransformUtility.RectangleContainsScreenPoint(validAreas[0], Input.mousePosition)) // 좌측
+                SetScale(0.7f);
         }
         else
         {
-            // 유효하지 않은 위치면 마지막 유효 위치로 즉시 복귀
             rectTransform.anchoredPosition = lastValidPosition;
         }
+    }
+
+    private void SetScale(float scale) // 어느 영역에 문서가 있는지에 따라 확대 축소 표시
+    {
+        rectTransform.localScale = Vector3.one * scale;
     }
 
     // 현재 RectTransform이 어떤 유효 영역 안에 있는지 확인
