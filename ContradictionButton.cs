@@ -1,66 +1,31 @@
-// 지적 버튼: 두 UI 정보 요소 선택 후 불일치 판단
+// 지적 버튼을 누른 후 두 항목 연결 시 판단 매니저에게 판단을 넘김
 
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ContradictionButton : MonoBehaviour
 {
-    // 검사 결과를 출력할 UI 텍스트
-    public Text resultText;
+    public DocumentJudgeManager judgeManager; // 판단 매니저 연결
 
-    // 현재 선택된 두 개의 정보 요소
-    private IInfoSelectable firstSelection;
-    private IInfoSelectable secondSelection;
+    private bool isJudging = false;
 
-    // 현재 지적 모드가 활성화되어 있는지를 나타내는 플래그
-    private bool isActive = false;
-
-    // 지적 버튼 클릭 시 호출되는 함수
-    public void OnContradictButtonClick()
+    // 지적 버튼을 눌렀을 때 판단 모드 시작
+    public void OnClick()
     {
-        isActive = true;  // 지적 모드 활성화
-        resultText.text = "불일치 검사 모드: 두 항목을 선택하세요.";
+        isJudging = true;
+        judgeManager.StartContradictionMode(); // 선택 초기화
     }
 
-    // 문서나 인물에서 정보 항목을 선택했을 때 호출되는 함수
-    public void OnInfoSelected(IInfoSelectable selected)
+    // 항목 두 개가 클릭된 이후에 호출되는 메서드
+    public void OnSecondItemClicked()
     {
-        if (!isActive) return; // 지적 모드가 아니면 무시
+        if (!isJudging) return;
 
-        // 첫 번째 선택 저장
-        if (firstSelection == null)
+        if (judgeManager.HasSelectedTwoItems())
         {
-            firstSelection = selected;
-        }
-        // 두 번째 선택 저장 후 바로 비교
-        else if (secondSelection == null)
-        {
-            secondSelection = selected;
-            CheckContradiction(); // 두 선택 항목 비교
-        }
-    }
+            string result = judgeManager.EvaluateContradiction();
+            Debug.Log(result); // 결과 출력
 
-    // 두 선택된 정보를 비교하여 불일치 메시지 출력
-    void CheckContradiction()
-    {
-        // 인터페이스에서 반환된 문자열 비교
-        if (firstSelection.GetInfo() != secondSelection.GetInfo())
-        {
-            resultText.text = "불일치 발견: 정보가 다릅니다.";
+            isJudging = false;
         }
-        else
-        {
-            resultText.text = "불일치 없음: 정보가 동일합니다.";
-        }
-
-        ResetSelections(); // 다음 검사 위해 초기화
-    }
-
-    // 선택 상태 초기화
-    void ResetSelections()
-    {
-        firstSelection = null;
-        secondSelection = null;
-        isActive = false; // 지적 모드 비활성화
     }
 }
