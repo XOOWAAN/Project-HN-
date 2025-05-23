@@ -5,13 +5,13 @@ public class DocumentJudgeManager : MonoBehaviour
 {
     // 판단 결과 타입
     public enum JudgmentResult
-    {
+    { 
         Pass,       // 합격
         Fail,       // 불합격
         Mismatch    // 항목 불일치 (지적 가능)
     }
 
-    // 항목 데이터 구조 (지적 모드에서 사용하는 개별 항목)
+    // InfoItem은 UI 조작을 위해 추가로 만들어진 표현 수단임. DocumentData를 UI클릭용으로 분해해서 쓰는 것.
     [System.Serializable]
     public class InfoItem
     {
