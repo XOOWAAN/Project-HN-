@@ -4,46 +4,42 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // TextMeshPro를 사용하는 경우
 
 public class InfoItemUI : MonoBehaviour
 {
-    public Text labelText;
-    public Text valueText;
+    [SerializeField] private TextMeshProUGUI labelText;   // 항목 이름 텍스트
+    [SerializeField] private TextMeshProUGUI valueText;   // 항목 값 텍스트
+    [SerializeField] private Button button;               // 클릭 버튼
 
     private DocumentJudgeManager judgeManager;
-    private DocumentJudgeManager.InfoItem infoItem;
+    private DocumentJudgeManager.InfoItem item;
 
-    private Button button;
-
-    public void Initialize(DocumentJudgeManager.InfoItem item, DocumentJudgeManager manager)
+    // 항목 정보를 세팅하고 버튼 클릭 연결
+    public void Initialize(DocumentJudgeManager.InfoItem item, DocumentJudgeManager judgeManager)
     {
-        infoItem = item;
-        judgeManager = manager;
+        this.item = item;
+        this.judgeManager = judgeManager;
 
-        if (labelText != null) labelText.text = item.label;
-        if (valueText != null) valueText.text = item.value;
-    }
+        if (labelText != null)
+            labelText.text = item.label;
 
-    private void Awake()
-    {
-        button = GetComponent<Button>();
+        if (valueText != null)
+            valueText.text = item.value;
+
         if (button != null)
-        {
-            button.onClick.AddListener(OnClickItem);
-        }
+            button.onClick.AddListener(OnClick);
     }
 
-    private void OnClickItem()
+    // 클릭 시 항목 선택 및 지적 판단 실행
+    private void OnClick()
     {
-        if (judgeManager != null)
-        {
-            judgeManager.SelectItem(infoItem);
+        judgeManager.SelectItem(item);
 
-            if (judgeManager.HasSelectedTwoItems())
-            {
-                string result = judgeManager.EvaluateContradiction();
-                Debug.Log(result);
-            }
+        if (judgeManager.HasSelectedTwoItems())
+        {
+            string result = judgeManager.EvaluateContradiction();  // 두 항목 비교
+            judgeManager.ShowResultUI(result);                     // 결과 UI 표시
         }
     }
 }
