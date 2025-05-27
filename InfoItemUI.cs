@@ -1,21 +1,20 @@
-// InfoItem 데이터를 실제로 화면에 표시, 클릭할 수 있게 만드는 UI 컴포넌트 스크립트
-// 예로, DocumentData는 주민등록증 전체고, InfoItem은 민증의 항목 하나임. InfoItemUI는 항목 클릭 가능하게 함
-//버튼이나 텍스트 클릭 시 InfoItemUI가 이를 감지하고 DocumentJudgeManager에게 알려주는 역할을 함
+// InfoItem 데이터를 실제로 화면에 표시, 클릭할 수 있게 만드는 UI 컴포넌트
+// 예: 주민등록증의 이름, 생년월일 등 개별 항목을 표시하고 선택 가능하게 함
 
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // TextMeshPro를 사용하는 경우
+using TMPro;
 
 public class InfoItemUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI labelText;   // 항목 이름 텍스트
     [SerializeField] private TextMeshProUGUI valueText;   // 항목 값 텍스트
-    [SerializeField] private Button button;               // 클릭 버튼
+    [SerializeField] private Button button;               // 항목 클릭 버튼
 
     private DocumentJudgeManager judgeManager;
-    private DocumentJudgeManager.InfoItem item;
+    private DocumentJudgeManager.InfoItem item;           // 비교용 데이터 항목
 
-    // 항목 정보를 세팅하고 버튼 클릭 연결
+    // InfoItem 데이터를 받아 UI 구성 및 클릭 이벤트 연결
     public void Initialize(DocumentJudgeManager.InfoItem item, DocumentJudgeManager judgeManager)
     {
         this.item = item;
@@ -28,18 +27,21 @@ public class InfoItemUI : MonoBehaviour
             valueText.text = item.value;
 
         if (button != null)
+        {
+            button.onClick.RemoveAllListeners(); // 중복 연결 방지
             button.onClick.AddListener(OnClick);
+        }
     }
 
-    // 클릭 시 항목 선택 및 지적 판단 실행
+    // 버튼 클릭 시 항목 선택을 판단 매니저에 전달
     private void OnClick()
     {
         judgeManager.SelectItem(item);
 
         if (judgeManager.HasSelectedTwoItems())
         {
-            string result = judgeManager.EvaluateContradiction();  // 두 항목 비교
-            judgeManager.ShowResultUI(result);                     // 결과 UI 표시
+            string result = judgeManager.EvaluateContradiction();
+            judgeManager.ShowResultUI(result);
         }
     }
 }
