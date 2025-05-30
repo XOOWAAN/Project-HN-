@@ -15,6 +15,10 @@ public class DocumentSplitDisplay : MonoBehaviour
     public RectTransform rightMask;
     public RectTransform personArea;
 
+    [Header("드래그 금지 영역")]
+    public RectTransform invalidArea1;
+    public RectTransform invalidArea2;
+
     private GameObject leftDocUI;
 
     private DocumentData cachedData;
@@ -33,6 +37,7 @@ public class DocumentSplitDisplay : MonoBehaviour
         if (dragHandler != null)
         {
             dragHandler.validAreas = new RectTransform[] { leftMask, rightMask, personArea };
+            dragHandler.invalidAreas = new RectTransform[] { invalidArea1, invalidArea2 };
         }
 
         // 초기 위치를 숨긴 영역(인물 손)으로 설정

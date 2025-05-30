@@ -14,6 +14,9 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [Header("드래그 허용 영역")]
     public RectTransform[] validAreas;   // 드래그가 허용된 영역들 (좌측 책상, 우측 책상, 인물 영역 등)
 
+    [Header("드래그 금지 영역")]
+    public RectTransform[] invalidAreas; // 드래그가 금지된 영역들
+
     void Awake()
     {
         // 컴포넌트 초기화
@@ -46,7 +49,7 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (IsInValidArea(rectTransform))
+        if (IsInValidArea(rectTransform) && !IsInInvalidArea(rectTransform))
         {
             lastValidPosition = rectTransform.anchoredPosition;
 
@@ -77,5 +80,16 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                 return true;
         }
         return false; // 어느 영역에도 포함되지 않음
+    }
+
+    // 현재 RectTransform이 어떤 금지 영역 안에 있는지 확인
+    private bool IsInInvalidArea(RectTransform dragTarget)
+    {
+        foreach (var area in invalidAreas)
+        {
+            if (RectTransformUtility.RectangleContainsScreenPoint(area, Input.mousePosition))
+                return true;
+        }
+        return false;
     }
 }
