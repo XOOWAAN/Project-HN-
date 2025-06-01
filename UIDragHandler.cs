@@ -1,95 +1,96 @@
 // 문서 드래그, 유효하지 않은 영역에 드롭하면 마지막 유효한 위치로 자동 복귀
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private RectTransform rectTransform; // 이 오브젝트의 RectTransform
-    private Canvas canvas;               // 이 오브젝트가 소속된 캔버스
-    private Vector2 originalPosition;    // 드래그 시작 시 위치
-    private Vector2 lastValidPosition;   // 마지막으로 드롭된 유효한 위치
+    private RectTransform rectTransform; // 드래그 대상의 RectTransform
+    private Canvas canvas;               // 드래그가 이루어지는 부모 캔버스
 
-    [Header("드래그 허용 영역")]
-    public RectTransform[] validAreas;   // 드래그가 허용된 영역들 (좌측 책상, 우측 책상, 인물 영역 등)
+    private Vector2 offset;              // 클릭 위치와 문서 중심 사이의 거리
+    private RectTransform validArea;     // 문서가 이동 가능한 유일한 영역 (RightDesk)
 
-    [Header("드래그 금지 영역")]
-    public RectTransform[] invalidAreas; // 드래그가 금지된 영역들
+    [Header("드래그 허용 영역 (RightDesk만)")]
+    public RectTransform rightDeskArea;
 
     void Awake()
     {
-        // 컴포넌트 초기화
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
+
+        // 유효한 드래그 영역으로 우측 책상(RightDesk) 설정
+        validArea = rightDeskArea;
     }
 
     // 드래그 시작 시 호출됨
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // 현재 위치를 저장해둠 (필요 시 복귀용)
-        originalPosition = rectTransform.anchoredPosition;
-    }
-
-    // 드래그 중 매 프레임마다 호출됨
-    public void OnDrag(PointerEventData eventData)
-    {
-        Vector2 pos;
-        // 드래그 위치를 캔버스 내부의 좌표계로 변환
+        // 클릭한 마우스 위치를 캔버스 로컬 좌표로 변환
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
             null,
-            out pos
+            out var localPoint
         );
 
-        // 오브젝트 위치 갱신
-        rectTransform.anchoredPosition = pos;
+        // 드래그 시작 시 클릭 지점과 오브젝트 중심의 거리 계산
+        offset = rectTransform.anchoredPosition - localPoint;
     }
 
+    // 드래그 중 계속 호출됨
+    public void OnDrag(PointerEventData eventData)
+    {
+        Vector2 localPoint;
+        // 현재 마우스 위치를 캔버스 로컬 좌표로 변환
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            eventData.position,
+            null,
+            out localPoint))
+        {
+            // 마우스 위치 + offset = 목표 위치
+            Vector2 targetPosition = localPoint + offset;
+
+            // 목표 위치를 유효 영역 안으로 제한
+            Vector2 clampedPosition = ClampToArea(targetPosition, validArea);
+            rectTransform.anchoredPosition = clampedPosition;
+        }
+    }
+
+    // 드래그 종료 시 호출됨 (필요 시 후처리 추가 가능)
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (IsInValidArea(rectTransform) && !IsInInvalidArea(rectTransform))
-        {
-            lastValidPosition = rectTransform.anchoredPosition;
-
-            // 확대/축소 처리
-            if (RectTransformUtility.RectangleContainsScreenPoint(validAreas[1], Input.mousePosition)) // 우측
-                SetScale(1.2f);
-            else if (RectTransformUtility.RectangleContainsScreenPoint(validAreas[0], Input.mousePosition)) // 좌측
-                SetScale(0.7f);
-        }
-        else
-        {
-            rectTransform.anchoredPosition = lastValidPosition;
-        }
+        // 현재는 드래그 종료 시 특별한 처리 없음
     }
 
-    private void SetScale(float scale) // 어느 영역에 문서가 있는지에 따라 확대 축소 표시
+    // 지정된 영역 내부로 위치를 제한 (Clamp)
+    private Vector2 ClampToArea(Vector2 targetPos, RectTransform area)
     {
-        rectTransform.localScale = Vector3.one * scale;
+        Vector3[] corners = new Vector3[4];
+        area.GetWorldCorners(corners); // 영역의 월드 코너 좌표 받아오기
+
+        // 좌상단(corners[0]) ~ 우하단(corners[2]) 범위 계산
+        Vector2 min = WorldToAnchored(corners[0]);
+        Vector2 max = WorldToAnchored(corners[2]);
+
+        // x, y 좌표를 min-max 사이로 제한
+        float clampedX = Mathf.Clamp(targetPos.x, min.x, max.x);
+        float clampedY = Mathf.Clamp(targetPos.y, min.y, max.y);
+
+        return new Vector2(clampedX, clampedY);
     }
 
-    // 현재 RectTransform이 어떤 유효 영역 안에 있는지 확인
-    private bool IsInValidArea(RectTransform dragTarget)
+    // 월드 좌표 → 캔버스 기준의 로컬 좌표로 변환
+    private Vector2 WorldToAnchored(Vector3 worldPos)
     {
-        foreach (var area in validAreas)
-        {
-            // 마우스가 유효 영역 중 하나 위에 있을 경우 true 반환
-            if (RectTransformUtility.RectangleContainsScreenPoint(area, Input.mousePosition))
-                return true;
-        }
-        return false; // 어느 영역에도 포함되지 않음
-    }
-
-    // 현재 RectTransform이 어떤 금지 영역 안에 있는지 확인
-    private bool IsInInvalidArea(RectTransform dragTarget)
-    {
-        foreach (var area in invalidAreas)
-        {
-            if (RectTransformUtility.RectangleContainsScreenPoint(area, Input.mousePosition))
-                return true;
-        }
-        return false;
+        Vector2 localPoint;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            RectTransformUtility.WorldToScreenPoint(null, worldPos),
+            null,
+            out localPoint
+        );
+        return localPoint;
     }
 }
