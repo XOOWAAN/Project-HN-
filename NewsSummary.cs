@@ -3,8 +3,9 @@ using System.Collections.Generic;
 
 // 각 날짜에 대한 뉴스 요약 데이터를 관리하는 스크립트
 public class NewsSummary : MonoBehaviour
-{
-    private Dictionary<int, string> newsByDay = new Dictionary<int, string>()
+{   
+    // 일자별 뉴스 요약 저장
+    private Dictionary<int, string> newsByDay = new Dictionary<int, string>() 
     {
         { 1, "관문 인근에서 폭발 사건 발생!" },
         { 2, "심사 기준 강화 예정." },

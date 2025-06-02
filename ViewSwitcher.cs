@@ -10,20 +10,20 @@ using UnityEngine;
 
 public class ViewSwitcher : MonoBehaviour
 {
-    public GameObject collapsedView;  // 책상 축소 화면
-    public GameObject expandedView;   // 책상 확대 화면
+    public GameObject CollapsedView;  // 책상 축소 화면
+    public GameObject ExpandedView;   // 책상 확대 화면
 
     // 처리 버튼을 눌렀을 때 호출
     public void SwitchToExpandedView()
     {
-        collapsedView.SetActive(false);
-        expandedView.SetActive(true);
+        CollapsedView.SetActive(false);
+        ExpandedView.SetActive(true);
     }
 
     // 완료 버튼을 눌렀을 때 호출
     public void SwitchToCollapsedView()
     {
-        expandedView.SetActive(false);
-        collapsedView.SetActive(true);
+        ExpandedView.SetActive(false);
+        CollapsedView.SetActive(true);
     }
 }
