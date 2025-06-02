@@ -1,11 +1,12 @@
+// 문서 판단을 담당하는 핵심 매니저 스크립트
+// InfoItem 두 개를 선택해 비교하고 결과를 UI로 출력하며,
+// 불일치 발생 시 NotificationPanel을 통해 경고 알림 생성
+
 using UnityEngine;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-// 문서 판단을 담당하는 핵심 매니저 스크립트
-// InfoItem 두 개를 선택해 비교하고 결과를 UI로 출력하며,
-// 불일치 발생 시 NotificationPanel을 통해 경고 알림 생성
 public class DocumentJudgeManager : MonoBehaviour
 {
     [System.Serializable]
