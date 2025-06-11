@@ -72,8 +72,9 @@ public class DocumentGenerator : MonoBehaviour
 
             DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
 
-            // orderPriority 값 할당
+            // '문서 생성 시' orderPriority 값 할당(유니티 컴포넌트에서 하는 듯)
             // 이 값이 낮을수록 UI 계층에서 위로 올라가도록 DocumentSplitDisplay 스크립트가 관리함
+            // 필요 시 이 시스템에 맞춰 문서 클릭 우선순위, 드래그 처리, 투명도 조절 같은 후속 기능도 연결
             splitDisplay.orderPriority = index;
 
             splitDisplay.InitializeDocument(data);

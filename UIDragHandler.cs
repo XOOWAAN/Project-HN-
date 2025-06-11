@@ -1,9 +1,10 @@
 // 문서 드래그, 유효하지 않은 영역에 드롭하면 마지막 유효한 위치로 자동 복귀
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
 {
     private RectTransform rectTransform; // 드래그 대상의 RectTransform
     private Canvas canvas;               // 드래그가 이루어지는 부모 캔버스
@@ -23,9 +24,17 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         validArea = rightDeskArea;
     }
 
+    // 클릭 시 문서를 가장 위(UI 상단)로 올림
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        transform.SetAsLastSibling(); // 클릭만으로도 문서가 최상단에 오도록 처리
+    }
+
     // 드래그 시작 시 호출됨
     public void OnBeginDrag(PointerEventData eventData)
     {
+        transform.SetAsLastSibling(); // 드래그 시작 시에도 문서를 최상단으로 이동
+
         // 클릭한 마우스 위치를 캔버스 로컬 좌표로 변환
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
