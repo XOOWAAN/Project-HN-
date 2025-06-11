@@ -4,12 +4,19 @@
 
 using UnityEngine;
 
-// 직렬화하면 인스펙터에서도 볼 수 있음
+public enum DocumentType
+{
+    IDCard,         // 신분증
+    BusinessPermit, // 사업허가증
+    Pass            // 통행증
+}
+
 [System.Serializable]
 public class DocumentData
 {
-    public string fullName;         // 이름 (예: "Bae Ki Gas")
-    public string nationality;      // 국적 (예: "Korea")
-    public string dateOfBirth;      // 생년월일 (예: "1980.01.15")
-    public Sprite photo;            // 증명사진으로 사용할 이미지
+    public string fullName;
+    public string nationality;
+    public string dateOfBirth;
+    public Sprite photo;
+    public DocumentType documentType; // 문서 종류 필드 추가
 }

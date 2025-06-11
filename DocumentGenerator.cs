@@ -6,50 +6,81 @@ using System.Collections.Generic;
 public class DocumentGenerator : MonoBehaviour
 {
     [Header("문서 UI 프리팹")]
-    public GameObject splitDisplayPrefab;         // 확대 화면용
-    public GameObject compactDocumentPrefab;      // 축소 화면용 (정보 없이 작게 표시)
+    public GameObject splitDisplayPrefab;         // 확대 화면용 문서 프리팹
+    public GameObject compactDocumentPrefab;      // 축소 화면용 (정보 없이 작게 표시되는 프리팹)
 
     [Header("문서 생성 위치")]
-    public Transform expandedDocumentParent;      // 확대 화면 문서 부모
-    public Transform compactDocumentParent;       // 축소 화면 문서 부모 (책상 위)
+    public Transform expandedDocumentParent;      // 확대 화면 문서의 부모
+    public Transform compactDocumentParent;       // 축소 화면 문서의 부모
+
+    [Header("축소 화면 문서 위치 (총 4개 영역 중 3개 사용)")]
+    public RectTransform[] compactPositions;      // 문서 종류 순서대로 위치 지정
+    // Unity 에디터에서 축소 화면 내 문서를 배치할 3개의 RectTransform을 등록(문서 순으로)
 
     [Header("데이터 소스")]
     public List<string> randomNames;
     public List<string> nationalities;
     public List<Sprite> photos;
 
-    public void GenerateRandomDocument()
-    {
-        // 1. 확대 화면 문서 생성 (정보 포함)
-        GameObject doc = Instantiate(splitDisplayPrefab, expandedDocumentParent);
-        DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
+    private List<DocumentData> currentDocuments = new List<DocumentData>();
 
+    public void GenerateAllDocuments()
+    {
+        currentDocuments.Clear();
+
+        // 문서 종류 순서대로 3개 생성
+        CreateAndPlaceDocument(DocumentType.IDCard, 0);
+        CreateAndPlaceDocument(DocumentType.BusinessPermit, 1);
+        CreateAndPlaceDocument(DocumentType.Pass, 2);
+    }
+
+    private void CreateAndPlaceDocument(DocumentType type, int index)
+    {
         DocumentData data = new DocumentData {
             fullName = randomNames[Random.Range(0, randomNames.Count)],
             nationality = nationalities[Random.Range(0, nationalities.Count)],
             dateOfBirth = RandomDate(),
-            photo = photos[Random.Range(0, photos.Count)]
+            photo = photos[Random.Range(0, photos.Count)],
+            documentType = type
         };
+        currentDocuments.Add(data);
 
-        splitDisplay.InitializeDocument(data);
-        splitDisplay.AnimateGiveDocument();
-
-        // 2. 축소 화면 문서 생성 (정보 없이 단순 표시)
+        // --- 축소 화면용 문서 생성 ---
         if (compactDocumentPrefab != null && compactDocumentParent != null)
         {
             GameObject compactDoc = Instantiate(compactDocumentPrefab, compactDocumentParent);
+            RectTransform rect = compactDoc.GetComponent<RectTransform>();
 
-            // 위치/크기 조정 또는 간단한 연출
-            compactDoc.transform.localScale = Vector3.one * 0.4f;
+            // 축소 화면 문서는 지정된 위치 배열(compactPositions)에서 각 인덱스 위치에 배치됨
+            // 문서 종류만큼 유니티 에디터에 등록하기
+            if (index < compactPositions.Length)
+                rect.anchoredPosition = compactPositions[index].anchoredPosition;
 
-            // 애니메이션 예시: 책상 위로 슬라이드 등장
+            compactDoc.transform.localScale = Vector3.one * 0.4f; // 축소 크기로 조정
+
             Animator animator = compactDoc.GetComponent<Animator>();
             if (animator != null)
-                animator.SetTrigger("Appear"); // Animator에 해당 트리거 추가 필요
+                animator.SetTrigger("Appear");
+        }
+
+        // --- 확대 화면용 문서 생성 ---
+        if (splitDisplayPrefab != null && expandedDocumentParent != null)
+        {
+            GameObject doc = Instantiate(splitDisplayPrefab, expandedDocumentParent);
+
+            // DocumentSplitDisplay의 orderPriority 값으로 우선순위를 관리
+
+            DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
+
+            // orderPriority 값 할당
+            // 이 값이 낮을수록 UI 계층에서 위로 올라가도록 DocumentSplitDisplay 스크립트가 관리함
+            splitDisplay.orderPriority = index;
+
+            splitDisplay.InitializeDocument(data);
+            splitDisplay.AnimateGiveDocument();
         }
     }
 
-    // 문서 생성 범위
     private string RandomDate()
     {
         int year = Random.Range(1960, 2005);

@@ -25,6 +25,9 @@ public class DocumentSplitDisplay : MonoBehaviour
     private GameObject docUI;
     private DocumentData cachedData;
 
+    // 정렬 우선순위 (낮을수록 위에 그려짐)
+    public int orderPriority = 0;
+
     public void InitializeDocument(DocumentData data)
     {
         cachedData = data;
@@ -46,6 +49,9 @@ public class DocumentSplitDisplay : MonoBehaviour
         // 초기 위치를 인물 손 위치로 설정
         RectTransform docRect = docUI.GetComponent<RectTransform>();
         docRect.anchoredPosition = personArea.anchoredPosition;
+
+        // 우선순위에 따라 문서 정렬 (낮을수록 위에 위치)
+        docRect.SetSiblingIndex(orderPriority); // ← 추가됨
 
         // 문서를 우측 책상 중앙으로 떨어뜨리는 애니메이션 실행
         AnimateDropToDesk(0.3f);
