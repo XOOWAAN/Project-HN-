@@ -1,5 +1,6 @@
-// 하나의 문서를 우측 책상에만 표시하고, 좌측은 시각 연출용으로만 활용
+// 문서를 우측 책상에만 표시하고, 좌측은 시각 연출용으로 RenderTexture 사용
 // 인물이 문서를 건네주는 연출도 포함
+// 좌측 영역은 책상 축소 화면에 카메라를 추가해 스크립트와 연결해야 함
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,10 @@ public class DocumentSplitDisplay : MonoBehaviour
 
     [Header("드래그 금지 영역")]
     public RectTransform invalidArea2;       // 우측 금지 영역만 유효
+
+    [Header("좌측 RenderTexture 표시용")]
+    public RawImage leftPreviewImage;        // 확대 화면 좌측에 보여줄 이미지 (축소 화면의 일부)
+    public RenderTexture miniDeskTexture;    // 축소 화면 카메라의 렌더 타겟
 
     private GameObject docUI;
     private DocumentData cachedData;
@@ -34,7 +39,6 @@ public class DocumentSplitDisplay : MonoBehaviour
         UIDragHandler dragHandler = docUI.GetComponent<UIDragHandler>();
         if (dragHandler != null)
         {
-            // 우측 책상 내에서만 드래그 가능하도록 설정
             dragHandler.validAreas = new RectTransform[] { rightMask };
             dragHandler.invalidAreas = new RectTransform[] { invalidArea2 };
         }
@@ -45,6 +49,12 @@ public class DocumentSplitDisplay : MonoBehaviour
 
         // 문서를 우측 책상 중앙으로 떨어뜨리는 애니메이션 실행
         AnimateDropToDesk(0.3f);
+
+        // 좌측에 축소 화면을 렌더링한 이미지 보여주기
+        if (leftPreviewImage != null && miniDeskTexture != null)
+        {
+            leftPreviewImage.texture = miniDeskTexture; // RenderTexture 적용
+        }
     }
 
     public void AnimateGiveDocument(float duration = 0.5f)
@@ -70,7 +80,6 @@ public class DocumentSplitDisplay : MonoBehaviour
         docRect.anchoredPosition = to;
     }
 
-    // 문서를 위쪽에서 아래로 떨어뜨리는 연출용 애니메이션
     public void AnimateDropToDesk(float duration = 0.3f)
     {
         StartCoroutine(DropToDeskAnimation(duration));
@@ -80,8 +89,8 @@ public class DocumentSplitDisplay : MonoBehaviour
     {
         RectTransform docRect = docUI.GetComponent<RectTransform>();
 
-        Vector2 targetPos = Vector2.zero; // 중앙 정렬 기준
-        Vector2 startPos = targetPos + new Vector2(0f, 300f); // 위에서 출발
+        Vector2 targetPos = Vector2.zero;
+        Vector2 startPos = targetPos + new Vector2(0f, 300f);
 
         docRect.anchoredPosition = startPos;
 

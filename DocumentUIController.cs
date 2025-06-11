@@ -1,4 +1,4 @@
-// 문서 정보를 UI로 표현하는 컨트롤러 스크립트
+// 문서 데이터를 UI로 표현하는 컨트롤러 스크립트
 
 using UnityEngine;
 using UnityEngine.UI;
