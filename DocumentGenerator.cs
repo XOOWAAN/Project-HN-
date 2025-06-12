@@ -39,7 +39,7 @@ public class DocumentGenerator : MonoBehaviour
         DocumentData data = new DocumentData {
             fullName = randomNames[Random.Range(0, randomNames.Count)],
             nationality = nationalities[Random.Range(0, nationalities.Count)],
-            dateOfBirth = RandomDate(),
+            birthDate = RandomDate(),
             photo = photos[Random.Range(0, photos.Count)],
             documentType = type
         };
@@ -69,12 +69,11 @@ public class DocumentGenerator : MonoBehaviour
             GameObject doc = Instantiate(splitDisplayPrefab, expandedDocumentParent);
 
             // DocumentSplitDisplay의 orderPriority 값으로 우선순위를 관리
-
-            DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
-
+            
             // '문서 생성 시' orderPriority 값 할당(유니티 컴포넌트에서 하는 듯)
             // 이 값이 낮을수록 UI 계층에서 위로 올라가도록 DocumentSplitDisplay 스크립트가 관리함
             // 필요 시 이 시스템에 맞춰 문서 클릭 우선순위, 드래그 처리, 투명도 조절 같은 후속 기능도 연결
+            DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
             splitDisplay.orderPriority = index;
 
             splitDisplay.InitializeDocument(data);

@@ -17,38 +17,45 @@ public static class DocumentFactory
     // 메인 생성 메서드
     public static DocumentData CreateDocument(DocumentType type, PersonData baseInfo)
     {
-        DocumentData doc = new DocumentData();
-        doc.documentType = type.ToString();
-
-        // 모든 문서에 공통적으로 들어가는 필드 (Ex: 이름 등)
-        doc.fullName = ShouldMakeError() ? GetRandomNameExcluding(baseInfo.fullName) : baseInfo.fullName;
-        doc.birthDate = ShouldMakeError() ? GetRandomBirthDateExcluding(baseInfo.birthDate) : baseInfo.birthDate;
+        DocumentData doc = new DocumentData
+        {
+            documentType = type.ToString(),
+            fullName = GetPossiblyIncorrect(() => baseInfo.fullName, GetRandomNameExcluding),
+            birthDate = GetPossiblyIncorrect(() => baseInfo.birthDate, GetRandomBirthDateExcluding)
+        };
 
         switch (type)
         {
             case DocumentType.IDCard:
-                doc.gender = ShouldMakeError() ? GetRandomGenderExcluding(baseInfo.gender) : baseInfo.gender;
-                doc.address = ShouldMakeError() ? GetRandomAddressExcluding(baseInfo.address) : baseInfo.address;
+                doc.gender = GetPossiblyIncorrect(() => baseInfo.gender, GetRandomGenderExcluding);
+                doc.address = GetPossiblyIncorrect(() => baseInfo.address, GetRandomAddressExcluding);
                 break;
 
             case DocumentType.BusinessPermit:
-                doc.gender = ShouldMakeError() ? GetRandomGenderExcluding(baseInfo.gender) : baseInfo.gender;
-                doc.businessType = ShouldMakeError() ? GetRandomBusinessType() : baseInfo.businessType;
+                doc.gender = GetPossiblyIncorrect(() => baseInfo.gender, GetRandomGenderExcluding);
+                doc.businessType = GetPossiblyIncorrect(() => baseInfo.businessType, _ => GetRandomBusinessType());
                 break;
 
             case DocumentType.Pass:
-                doc.departure = ShouldMakeError() ? GetRandomLocationExcluding(baseInfo.departure) : baseInfo.departure;
-                doc.destination = ShouldMakeError() ? GetRandomLocationExcluding(baseInfo.destination) : baseInfo.destination;
+                doc.departure = GetPossiblyIncorrect(() => baseInfo.departure, GetRandomLocationExcluding);
+                doc.destination = GetPossiblyIncorrect(() => baseInfo.destination, GetRandomLocationExcluding);
                 break;
         }
 
         return doc;
     }
 
-    // 30% 확률로 true 반환 (오류 발생 여부)
+    // 30% 확률로 오류 삽입 여부 결정
     private static bool ShouldMakeError()
     {
         return UnityEngine.Random.value < ErrorProbability;
+    }
+
+    // 오류 삽입 시 대체 값을 가져오는 헬퍼 메서드
+    private static string GetPossiblyIncorrect(Func<string> correctValueGetter, Func<string, string> errorGenerator)
+    {
+        string correct = correctValueGetter();
+        return ShouldMakeError() ? errorGenerator(correct) : correct;
     }
 
     // 오류용 랜덤 데이터 생성기 (정확한 Pool은 나중에 정리 가능)
