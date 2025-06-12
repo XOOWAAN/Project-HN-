@@ -15,13 +15,13 @@ public static class DocumentFactory
     public enum DocumentType { IDCard, BusinessPermit, Pass }
 
     // 메인 생성 메서드
-    public static DocumentData CreateDocument(DocumentType type, PersonInfo baseInfo)
+    public static DocumentData CreateDocument(DocumentType type, PersonData baseInfo)
     {
         DocumentData doc = new DocumentData();
         doc.documentType = type.ToString();
 
         // 모든 문서에 공통적으로 들어가는 필드 (Ex: 이름 등)
-        doc.fullName = ShouldMakeError() ? GetRandomNameExcluding(baseInfo.name) : baseInfo.name;
+        doc.fullName = ShouldMakeError() ? GetRandomNameExcluding(baseInfo.fullName) : baseInfo.fullName;
         doc.birthDate = ShouldMakeError() ? GetRandomBirthDateExcluding(baseInfo.birthDate) : baseInfo.birthDate;
 
         switch (type)
