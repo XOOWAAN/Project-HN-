@@ -1,41 +1,18 @@
-// 인물 생성 데이터
+// 인물 정보 구조체
 using UnityEngine;
-using System.Collections.Generic;
 
-public class PersonGenerator : MonoBehaviour
+[System.Serializable]
+public class PersonData
 {
-    [Header("인물 UI 프리팹")]
-    public GameObject personPrefab;
+    public string fullName;         // 이름
+    public string birthDate;        // 생년월일
+    public string nationality;      // 국적
+    public Sprite faceSprite;       // 얼굴 이미지
+    public Sprite bodySprite;       // 몸통 이미지
 
-    [Header("생성 위치")]
-    public Transform personParent;
-
-    [Header("데이터 소스")]
-    public List<string> randomNames;
-    public List<string> nationalities;
-    public List<Sprite> photos;
-
-    public void GenerateRandomPerson()
-    {
-        GameObject personObj = Instantiate(personPrefab, personParent);
-        PersonDisplay display = personObj.GetComponent<PersonDisplay>();
-
-        PersonData data = new PersonData {
-            fullName = randomNames[Random.Range(0, randomNames.Count)],
-            nationality = nationalities[Random.Range(0, nationalities.Count)],
-            birthDate = RandomDate(),
-            photo = photos[Random.Range(0, photos.Count)]
-        };
-
-        display.InitializePerson(data);
-        display.AnimateEnter();
-    }
-
-    private string RandomDate()
-    {
-        int year = Random.Range(1960, 2005);
-        int month = Random.Range(1, 13);
-        int day = Random.Range(1, 28);
-        return $"{year}.{month:00}.{day:00}";
-    }
+    public string gender;           // 성별
+    public string address;          // 주소
+    public string businessType;     // 업종
+    public string departure;        // 출발지
+    public string destination;      // 목적지
 }

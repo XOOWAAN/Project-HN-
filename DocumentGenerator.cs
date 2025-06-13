@@ -1,4 +1,9 @@
-// 문서를 무작위로 생성하고 Canvas에 분할된 UI로 문서를 띄움
+// 문서를 무작위 또는 인물 기반으로 생성하고 Canvas에 분할된 UI로 문서를 띄움
+// PersonData를 기반으로 문서를 생성함
+
+// GenerateRandomDocuments() = 무작위 문서 생성 테스트/디버그 용도
+// GenerateDocumentsForPerson = 실제 게임용으로. PersonData 입력 기반 문서 생성
+// CreateAndPlaceDocumentRandom, CreateAndPlaceDocumentFromPerson = 문서 생성 로직
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -15,26 +20,36 @@ public class DocumentGenerator : MonoBehaviour
 
     [Header("축소 화면 문서 위치 (총 4개 영역 중 3개 사용)")]
     public RectTransform[] compactPositions;      // 문서 종류 순서대로 위치 지정
-    // Unity 에디터에서 축소 화면 내 문서를 배치할 3개의 RectTransform을 등록(문서 순으로)
 
-    [Header("데이터 소스")]
+    [Header("데이터 소스 (랜덤 생성용)")]
     public List<string> randomNames;
     public List<string> nationalities;
     public List<Sprite> photos;
 
     private List<DocumentData> currentDocuments = new List<DocumentData>();
 
-    public void GenerateAllDocuments()
+    // 무작위 문서를 생성하는 테스트용 함수
+    public void GenerateRandomDocuments()
     {
         currentDocuments.Clear();
 
-        // 문서 종류 순서대로 3개 생성
-        CreateAndPlaceDocument(DocumentType.IDCard, 0);
-        CreateAndPlaceDocument(DocumentType.BusinessPermit, 1);
-        CreateAndPlaceDocument(DocumentType.Pass, 2);
+        CreateAndPlaceDocumentRandom(DocumentType.IDCard, 0);
+        CreateAndPlaceDocumentRandom(DocumentType.BusinessPermit, 1);
+        CreateAndPlaceDocumentRandom(DocumentType.Pass, 2);
     }
 
-    private void CreateAndPlaceDocument(DocumentType type, int index)
+    // 게임용: 인물(PersonData)을 기반으로 문서를 생성하는 함수
+    public void GenerateDocumentsForPerson(PersonData data)
+    {
+        currentDocuments.Clear();
+
+        CreateAndPlaceDocumentFromPerson(data, DocumentType.IDCard, 0);
+        CreateAndPlaceDocumentFromPerson(data, DocumentType.BusinessPermit, 1);
+        CreateAndPlaceDocumentFromPerson(data, DocumentType.Pass, 2);
+    }
+
+    // 랜덤 문서를 생성하고 배치하는 내부 함수
+    private void CreateAndPlaceDocumentRandom(DocumentType type, int index)
     {
         DocumentData data = new DocumentData {
             fullName = randomNames[Random.Range(0, randomNames.Count)],
@@ -44,7 +59,6 @@ public class DocumentGenerator : MonoBehaviour
             documentType = type
         };
 
-        // 문서 타입에 따라 추가 정보 세팅
         switch (type)
         {
             case DocumentType.IDCard:
@@ -63,6 +77,44 @@ public class DocumentGenerator : MonoBehaviour
                 break;
         }
 
+        CreateDocumentUI(data, index);
+    }
+
+    // 인물 정보를 기반으로 문서를 생성하고 배치하는 내부 함수
+    private void CreateAndPlaceDocumentFromPerson(PersonData data, DocumentType type, int index)
+    {
+        DocumentData doc = new DocumentData {
+            fullName = data.fullName,
+            nationality = data.nationality,
+            dateOfBirth = data.birthDate,
+            photo = data.photo,
+            documentType = type
+        };
+
+        switch (type)
+        {
+            case DocumentType.IDCard:
+                doc.gender = data.gender;
+                doc.address = data.address;
+                break;
+
+            case DocumentType.BusinessPermit:
+                doc.gender = data.gender;
+                doc.businessType = data.businessType;
+                break;
+
+            case DocumentType.Pass:
+                doc.departure = data.departure;
+                doc.destination = data.destination;
+                break;
+        }
+
+        CreateDocumentUI(doc, index);
+    }
+
+    // 공통 UI 생성 로직 (문서 생성 + 애니메이션 처리)
+    private void CreateDocumentUI(DocumentData data, int index)
+    {
         currentDocuments.Add(data);
 
         // --- 축소 화면용 문서 생성 ---
@@ -71,12 +123,10 @@ public class DocumentGenerator : MonoBehaviour
             GameObject compactDoc = Instantiate(compactDocumentPrefab, compactDocumentParent);
             RectTransform rect = compactDoc.GetComponent<RectTransform>();
 
-            // 축소 화면 문서는 지정된 위치 배열(compactPositions)에서 각 인덱스 위치에 배치됨
-            // 문서 종류만큼 유니티 에디터에 등록하기
             if (index < compactPositions.Length)
                 rect.anchoredPosition = compactPositions[index].anchoredPosition;
 
-            compactDoc.transform.localScale = Vector3.one * 0.4f; // 축소 크기로 조정
+            compactDoc.transform.localScale = Vector3.one * 0.4f;
 
             Animator animator = compactDoc.GetComponent<Animator>();
             if (animator != null)
@@ -88,11 +138,6 @@ public class DocumentGenerator : MonoBehaviour
         {
             GameObject doc = Instantiate(splitDisplayPrefab, expandedDocumentParent);
 
-            // DocumentSplitDisplay의 orderPriority 값으로 우선순위를 관리
-            
-            // '문서 생성 시' orderPriority 값 할당(유니티 컴포넌트에서 하는 듯)
-            // 이 값이 낮을수록 UI 계층에서 위로 올라가도록 DocumentSplitDisplay 스크립트가 관리함
-            // 필요 시 이 시스템에 맞춰 문서 클릭 우선순위, 드래그 처리, 투명도 조절 같은 후속 기능도 연결
             DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
             splitDisplay.orderPriority = index;
 
@@ -101,6 +146,7 @@ public class DocumentGenerator : MonoBehaviour
         }
     }
 
+    // 날짜를 무작위로 생성하는 도우미 함수
     private string RandomDate()
     {
         int year = Random.Range(1960, 2005);
@@ -108,4 +154,4 @@ public class DocumentGenerator : MonoBehaviour
         int day = Random.Range(1, 28);
         return $"{year}.{month:00}.{day:00}";
     }
-}
+} 

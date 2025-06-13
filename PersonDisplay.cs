@@ -1,5 +1,6 @@
 // 인물 정보를 UI에 표시하는 스크립트
 // 얼굴 이미지와 몸통 이미지를 나누어 구성
+// 추후 인물 등장 시 애니메이션 재생을 여기서 해야 하나?
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,11 +18,9 @@ public class PersonDisplay : MonoBehaviour
     {
         personData = data;
 
-        // 얼굴과 몸통을 같은 이미지로 사용하는 경우
-        faceImage.sprite = data.photo;
-        bodyImage.sprite = data.photo;
-
-        // 필요시 얼굴/몸통을 따로 관리하려면 PersonData를 확장해야 함
+        // 얼굴과 몸통을 각각의 이미지로 설정
+        faceImage.sprite = data.faceSprite;
+        bodyImage.sprite = data.bodySprite;
     }
 
     // 인물이 등장하는 애니메이션
@@ -37,8 +36,3 @@ public class PersonDisplay : MonoBehaviour
         return personData;
     }
 }
-
-// PersonData의 photo 필드를 얼굴과 몸통으로 나누려면 다음과 같이 확장할 수 있음
-// public Sprite facePhoto;
-// public Sprite bodyPhoto;
-// 그리고 이 스크립트의 InitializePerson도 수정

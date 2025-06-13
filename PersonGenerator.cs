@@ -3,31 +3,30 @@ using System.Collections.Generic;
 
 public class PersonGenerator : MonoBehaviour
 {
-    [Header("인물 UI 프리팹")]
-    public GameObject personPrefab;             // 인물 UI 프리팹
+    public GameObject personPrefab;
+    public Transform personParent;
 
-    [Header("생성 위치")]
-    public Transform personParent;              // 생성될 위치
-
-    [Header("데이터 소스")]
     public List<string> randomNames;
     public List<string> nationalities;
-    public List<Sprite> photos;
+    public List<Sprite> faceSprites;
+    public List<Sprite> bodySprites;
 
-    public void GenerateRandomPerson()
+    public PersonData GenerateRandomPerson()
     {
-        GameObject personObj = Instantiate(personPrefab, personParent);
-        PersonDisplay display = personObj.GetComponent<PersonDisplay>();
-
         PersonData data = new PersonData {
             fullName = randomNames[Random.Range(0, randomNames.Count)],
             nationality = nationalities[Random.Range(0, nationalities.Count)],
-            dateOfBirth = RandomDate(),
-            photo = photos[Random.Range(0, photos.Count)]
+            birthDate = RandomDate(),
+            face = faceSprites[Random.Range(0, faceSprites.Count)],
+            body = bodySprites[Random.Range(0, bodySprites.Count)]
         };
 
+        GameObject personObj = Instantiate(personPrefab, personParent);
+        var display = personObj.GetComponent<PersonDisplay>();
         display.InitializePerson(data);
-        display.AnimateEnter(); // 필요시 진입 애니메이션
+        display.AnimateEnter();
+
+        return data;
     }
 
     private string RandomDate()
