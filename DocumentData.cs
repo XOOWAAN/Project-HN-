@@ -15,16 +15,16 @@ public enum DocumentType
 [System.Serializable]
 public class DocumentData
 {
-    public string fullName;             // 기존 name과 매칭
-    public string nationality;
-    public string dateOfBirth;
-    public Sprite photo;
-    public DocumentType documentType;   // 문서 종류 필드 추가
+    public string fullName;             // 이름
+    public string nationality;          // 국적
+    public string dateOfBirth;          // 생년월일 (소문자로 수정)
+    public Sprite photo;                // 사진
+    public DocumentType documentType;   // 문서 종류
 
-    // 아래는 DocumentFactory에서 사용하는 필드를 반영한 확장
+    // 문서별 추가 필드
     public string gender;               // 성별 (IDCard, BusinessPermit)
     public string address;              // 주소 (IDCard)
     public string businessType;         // 업종 (BusinessPermit)
     public string departure;            // 출발지 (Pass)
-    public string destination;          // 도착지 (Pass)
+    public string destination;          // 목적지 (Pass)
 }

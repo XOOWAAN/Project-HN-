@@ -39,10 +39,30 @@ public class DocumentGenerator : MonoBehaviour
         DocumentData data = new DocumentData {
             fullName = randomNames[Random.Range(0, randomNames.Count)],
             nationality = nationalities[Random.Range(0, nationalities.Count)],
-            birthDate = RandomDate(),
+            dateOfBirth = RandomDate(),
             photo = photos[Random.Range(0, photos.Count)],
             documentType = type
         };
+
+        // 문서 타입에 따라 추가 정보 세팅
+        switch (type)
+        {
+            case DocumentType.IDCard:
+                data.gender = Random.Range(0, 2) == 0 ? "남" : "여";
+                data.address = "서울특별시 중구";
+                break;
+
+            case DocumentType.BusinessPermit:
+                data.gender = Random.Range(0, 2) == 0 ? "남" : "여";
+                data.businessType = "식당업";
+                break;
+
+            case DocumentType.Pass:
+                data.departure = "평양";
+                data.destination = "서울";
+                break;
+        }
+
         currentDocuments.Add(data);
 
         // --- 축소 화면용 문서 생성 ---

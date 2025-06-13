@@ -8,20 +8,16 @@ using UnityEngine;
 
 public static class DocumentFactory
 {
-    // 오류가 발생할 확률 (0.3 = 30%)
     private const float ErrorProbability = 0.3f;
 
-    // 문서 종류 열거형
-    public enum DocumentType { IDCard, BusinessPermit, Pass }
-
-    // 메인 생성 메서드
     public static DocumentData CreateDocument(DocumentType type, PersonData baseInfo)
     {
         DocumentData doc = new DocumentData
         {
-            documentType = type.ToString(),
+            documentType = type, // enum 그대로 저장
             fullName = GetPossiblyIncorrect(() => baseInfo.fullName, GetRandomNameExcluding),
-            birthDate = GetPossiblyIncorrect(() => baseInfo.birthDate, GetRandomBirthDateExcluding)
+            dateOfBirth = GetPossiblyIncorrect(() => baseInfo.dateOfBirth, GetRandomDateOfBirthExcluding),
+            nationality = baseInfo.address // 예시: 국적은 주소에서 파생
         };
 
         switch (type)
@@ -33,7 +29,7 @@ public static class DocumentFactory
 
             case DocumentType.BusinessPermit:
                 doc.gender = GetPossiblyIncorrect(() => baseInfo.gender, GetRandomGenderExcluding);
-                doc.businessType = GetPossiblyIncorrect(() => baseInfo.businessType, _ => GetRandomBusinessType());
+                doc.businessType = GetPossiblyIncorrect(() => baseInfo.businessType, GetRandomBusinessTypeExcluding);
                 break;
 
             case DocumentType.Pass:
@@ -45,20 +41,16 @@ public static class DocumentFactory
         return doc;
     }
 
-    // 30% 확률로 오류 삽입 여부 결정
     private static bool ShouldMakeError()
     {
         return UnityEngine.Random.value < ErrorProbability;
     }
 
-    // 오류 삽입 시 대체 값을 가져오는 헬퍼 메서드
     private static string GetPossiblyIncorrect(Func<string> correctValueGetter, Func<string, string> errorGenerator)
     {
         string correct = correctValueGetter();
         return ShouldMakeError() ? errorGenerator(correct) : correct;
     }
-
-    // 오류용 랜덤 데이터 생성기 (정확한 Pool은 나중에 정리 가능)
 
     private static string GetRandomNameExcluding(string correct)
     {
@@ -67,7 +59,7 @@ public static class DocumentFactory
         return names[UnityEngine.Random.Range(0, names.Count)];
     }
 
-    private static string GetRandomBirthDateExcluding(string correct)
+    private static string GetRandomDateOfBirthExcluding(string correct)
     {
         List<string> dates = new List<string> { "1990-01-01", "1985-12-12", "2000-06-20", "1978-03-15" };
         dates.Remove(correct);
@@ -86,9 +78,10 @@ public static class DocumentFactory
         return addresses[UnityEngine.Random.Range(0, addresses.Count)];
     }
 
-    private static string GetRandomBusinessType()
+    private static string GetRandomBusinessTypeExcluding(string correct)
     {
         List<string> types = new List<string> { "Bakery", "Pharmacy", "Workshop", "Cafe" };
+        types.Remove(correct);
         return types[UnityEngine.Random.Range(0, types.Count)];
     }
 
