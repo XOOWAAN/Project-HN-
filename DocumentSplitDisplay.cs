@@ -5,6 +5,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class DocumentSplitDisplay : MonoBehaviour
 {
@@ -37,6 +38,31 @@ public class DocumentSplitDisplay : MonoBehaviour
         DocumentUIController controller = docUI.GetComponent<DocumentUIController>();
         controller.SetData(data);
         controller.SetScale(0.7f); // 초기 축소 상태로 시작
+
+        // 문서 외형 구성 (문서 종류별로 다르게 설정)
+        switch (data.documentType)
+        {
+            case DocumentType.IDCard:
+                controller.SetTitle("신분증");
+                controller.SetField("이름", data.fullName);
+                controller.SetField("생년월일", data.birthDate);
+                controller.SetField("성별", data.gender);
+                break;
+
+            case DocumentType.BusinessPermit:
+                controller.SetTitle("사업 허가증");
+                controller.SetField("이름", data.fullName);
+                controller.SetField("주소", data.address);
+                controller.SetField("업종", data.businessType);
+                break;
+
+            case DocumentType.Pass:
+                controller.SetTitle("통행증");
+                controller.SetField("이름", data.fullName);
+                controller.SetField("출발지", data.departure);
+                controller.SetField("도착지", data.destination);
+                break;
+        }
 
         // 드래그 설정
         UIDragHandler dragHandler = docUI.GetComponent<UIDragHandler>();
@@ -86,6 +112,7 @@ public class DocumentSplitDisplay : MonoBehaviour
         docRect.anchoredPosition = to;
     }
 
+    // 문서를 우측 중앙으로 슬라이드하는 애니메
     public void AnimateDropToDesk(float duration = 0.3f)
     {
         StartCoroutine(DropToDeskAnimation(duration));
