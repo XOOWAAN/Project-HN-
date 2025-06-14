@@ -29,9 +29,18 @@ public class DocumentJudgeManager : MonoBehaviour
     [Header("알림 패널 연동")]
     public NotificationPanel notificationPanel; // 경고 알림을 위한 참조
 
+    [Header("지적 버튼 연결")]
+    public ContradictionButton contradictionButton; // 버튼에서 콜백 호출
+
     private List<InfoItem> selectedItems = new List<InfoItem>(); // 선택된 비교 항목 리스트
 
     private int errorCount = 0; // 누적 경고 수
+
+    // 판단 모드 진입 시 초기화
+    public void StartContradictionMode()
+    {
+        selectedItems.Clear();
+    }
 
     // InfoItem 클릭 시 호출됨
     public void SelectItem(InfoItem item)
@@ -41,16 +50,10 @@ public class DocumentJudgeManager : MonoBehaviour
 
         selectedItems.Add(item);
 
-        if (HasSelectedTwoItems())
+        // 두 개 선택된 경우 ContradictionButton에 알림
+        if (HasSelectedTwoItems() && contradictionButton != null)
         {
-            string result = EvaluateContradiction();
-            ShowResultUI(result);
-
-            if (result.StartsWith("불일치"))
-            {
-                string reason = $"{selectedItems[0].label}과 {selectedItems[1].label}의 정보 불일치";
-                HandleJudgement(false, reason);
-            }
+            contradictionButton.OnSecondItemClicked();
         }
     }
 
