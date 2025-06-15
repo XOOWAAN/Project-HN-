@@ -23,15 +23,18 @@ public class ManualDatabase : ScriptableObject
 
             foreach (var entry in daily.manualEntries)
             {
-                // 기존에 이미 있는 항목이라면 최신 내용으로 덮어쓰기
                 if (entryDict.ContainsKey(entry.entryId))
                 {
-                    entryDict[entry.entryId].content = entry.content;
-                    entryDict[entry.entryId].image = entry.image;
+                    // 텍스트 누적
+                    entryDict[entry.entryId].content += "\n" + entry.content;
+
+                    // 이미지가 있다면 교체
+                    if (entry.image != null)
+                        entryDict[entry.entryId].image = entry.image;
                 }
                 else
                 {
-                    // 새 항목일 경우 복사해서 추가
+                    // 새 항목 추가
                     entryDict[entry.entryId] = new ManualEntry
                     {
                         entryId = entry.entryId,

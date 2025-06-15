@@ -30,3 +30,18 @@ public class ManualManager : MonoBehaviour
         currentDay = day;
     }
 }
+
+
+// [Manual System 구조]
+
+// ManualEntry: 개별 항목 (ID, 제목, 내용, 이미지, 연동 키 포함)
+// DailyManualData: 특정 날짜의 항목 묶음
+// ManualDatabase: 날짜별 항목 목록 전체 저장
+    // 같은 entryId는 덮어쓰기 → 최신 내용 유지
+    // 누적하고 싶으면 별도 병합 로직 필요
+// ManualManager: 현재 날짜 기준으로 유효 항목을 병합하여 반환
+
+// [향후 구현 필요]
+// - UI에 항목 목록 → 클릭 → 상세 페이지 → 뒤로가기 흐름
+// - 누적 텍스트 병합 옵션
+// - logicKey 기반 필터링 또는 연동 기능 추가
