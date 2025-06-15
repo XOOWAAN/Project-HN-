@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ContradictionButton : MonoBehaviour
 {
-    public DocumentJudgeManager judgeManager; // 판단 매니저 연결
+    public JudgeManager judgeManager; // 판단 매니저 연결
 
     private bool isJudging = false;
 
