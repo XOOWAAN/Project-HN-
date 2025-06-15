@@ -1,4 +1,4 @@
-// 문서 판단을 담당하는 핵심 매니저 스크립트
+// 모든 UI 비교 판단을 담당하는 핵심 매니저 스크립트
 // InfoItem 두 개를 선택해 비교하고 결과를 UI로 출력하며,
 // 불일치 발생 시 NotificationPanel을 통해 경고 알림 생성
 
@@ -7,7 +7,7 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-public class DocumentJudgeManager : MonoBehaviour
+public class JudgeManager : MonoBehaviour // 이름 변경됨 (기존: DocumentJudgeManager)
 {
     [System.Serializable]
     public class InfoItem
@@ -36,13 +36,24 @@ public class DocumentJudgeManager : MonoBehaviour
 
     private int errorCount = 0; // 누적 경고 수
 
+    public static JudgeManager Instance; // 싱글톤 참조 추가
+
+    private void Awake()
+    {
+        // 싱글톤 인스턴스 초기화
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
+
     // 판단 모드 진입 시 초기화
     public void StartContradictionMode()
     {
         selectedItems.Clear();
     }
 
-    // InfoItem 클릭 시 호출됨
+    // InfoItem 클릭 시 호출됨 (문서, 인물, 매뉴얼 공통)
     public void SelectItem(InfoItem item)
     {
         if (selectedItems.Count >= 2)
