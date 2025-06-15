@@ -11,11 +11,11 @@ public class InfoItemUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI valueText;   // 항목 값 텍스트
     [SerializeField] private Button button;               // 항목 클릭 버튼
 
-    private DocumentJudgeManager judgeManager;
-    private DocumentJudgeManager.InfoItem item;           // 비교용 데이터 항목
+    private JudgeManager judgeManager; // 변경: 통합 판단 매니저 사용
+    private JudgeManager.InfoItem item; // 변경: InfoItem 타입도 JudgeManager 기준으로
 
     // InfoItem 데이터를 받아 UI 구성 및 클릭 이벤트 연결
-    public void Initialize(DocumentJudgeManager.InfoItem item, DocumentJudgeManager judgeManager)
+    public void Initialize(JudgeManager.InfoItem item, JudgeManager judgeManager)
     {
         this.item = item;
         this.judgeManager = judgeManager;
