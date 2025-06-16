@@ -37,12 +37,12 @@ public class ManualManager : MonoBehaviour
 
 // [Manual System 구조]
 
-// ManualEntry: 개별 항목 (ID, 제목, 내용, 이미지, 연동 키 포함)
-// DailyManualData: 특정 날짜의 항목 묶음
-// ManualDatabase: 날짜별 항목 목록 전체 저장
+// ManualEntry: 개별 항목 내의 설명 (ID, 제목, 내용, 이미지, 연동 키 포함)
+// DailyManualData: 특정 날짜의 항목 리스트 (예시 : N일에는 어떤 규칙들 삭제 추가)
+// ManualDatabase: 모든 날짜별 항목의 데이터 전체 저장. 항목별 덮어쓰기나 병합도 담당
     // 같은 entryId는 덮어쓰기 → 최신 내용 유지
     // 누적하고 싶으면 별도 병합 로직 필요
-// ManualManager: 현재 날짜 기준으로 유효 항목을 병합하여 반환
+// ManualManager: 현재 날짜 기준으로 유효 항목을 정리해 UI나 판단 매니저가 사용 가능하게 함
 
 // [향후 구현 필요]
 // - UI에 항목 목록 → 클릭 → 상세 페이지 → 뒤로가기 흐름
