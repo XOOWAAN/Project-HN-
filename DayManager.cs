@@ -14,8 +14,8 @@ public class DayManager : MonoBehaviour
 
     private void Start()
     {
-        newsTVScreen.autoPlay = true;       // 자동 넘김 활성화
-        newsTVScreen.autoDelay = 1.2f;      // 대사 간 1.2초 대기
+        newsTVScreen.autoPlay = true;       // 대사 다 출력 후 자동 넘김 활성화
+        newsTVScreen.autoDelay = 1.0f;      // 대사 간 1초 대기
     }
 
     public void StartDay(int day)
