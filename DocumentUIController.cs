@@ -1,4 +1,9 @@
-// 문서 데이터를 UI로 표현하는 컨트롤러 스크립트
+// 문서 데이터를 UI에 시각적으로 표시하는 컨트롤러 스크립트
+
+// 주요 기능:
+// - SetData(DocumentData data): 문서 정보 설정 및 UI 텍스트/이미지 갱신
+// - BringToFront(): 문서를 UI 계층 맨 앞으로 이동시켜 강조 표시
+// - null 사진 대응: 사진이 없을 경우 기본 이미지로 대체 표시
 
 using UnityEngine;
 using UnityEngine.UI;
