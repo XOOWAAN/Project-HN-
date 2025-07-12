@@ -1,3 +1,17 @@
+// PersonGenerator.cs
+// ----------------------------
+// 게임에 등장할 인물 정보를 생성하고, 해당 데이터를 바탕으로 캐릭터 오브젝트를 생성함
+// 종족, 성별, 연령대, 사진 규칙에 따라 무작위 인물 데이터를 구성
+// 문서 생성 이전에 인물 정보를 먼저 생성하기 위한 핵심 스크립트
+
+// 주요 메서드:
+// - GeneratePersonData(): 인물 정보를 무작위로 생성해 PersonData로 반환 (UI, 오브젝트 없음)
+// - SpawnCharacter(PersonData): 인물 정보를 바탕으로 GameObject를 화면에 생성
+// - GetPhotoByRules(): 종족, 성별, 나이에 따라 적절한 얼굴 사진 선택
+// - GenerateBirthDate(age): 입력된 나이로부터 생년월일 문자열 생성
+// - GetRandomRace(): 오크, 인간, 엘프 중 무작위 종족 선택
+
+
 using UnityEngine;
 using System.Collections.Generic;
 

@@ -1,9 +1,12 @@
-// 문서 데이터를 UI에 시각적으로 표시하는 컨트롤러 스크립트
+// DocumentUIController.cs
+// ----------------------------
+// DocumentData를 기반으로 문서 UI에 실제 데이터를 표시하는 컨트롤러
+// 사진, 이름, 생년월일, 국적 등 문서 종류에 따라 필요한 항목만 UI에 출력함
+// DocumentGenerator 또는 DocumentSplitDisplay에서 호출되어 UI 구성
 
-// 주요 기능:
-// - SetData(DocumentData data): 문서 정보 설정 및 UI 텍스트/이미지 갱신
-// - BringToFront(): 문서를 UI 계층 맨 앞으로 이동시켜 강조 표시
-// - null 사진 대응: 사진이 없을 경우 기본 이미지로 대체 표시
+// 주요 메서드:
+// - SetData(DocumentData): 전달된 문서 데이터를 받아 각 UI 요소에 매핑
+// - BringToFront(): 해당 문서를 다른 UI 위로 올려 강조 표시
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,7 +29,8 @@ public class DocumentUIController : MonoBehaviour
     public Sprite defaultPhoto;        // null 대비 기본 사진 (옵션)
     public Canvas canvas;
 
-    private void Start() {
+    private void Start()
+    {
         canvas = GetComponent<Canvas>();
     }
 

@@ -1,10 +1,8 @@
 // 문서를 우측 책상에만 표시하고, 좌측은 시각 연출용으로 RenderTexture 사용
-// 인물이 문서를 건네주는 연출도 포함
 // 좌측 영역은 책상 축소 화면에 카메라를 추가해 스크립트와 연결해야 함
 
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using TMPro;
 
 public class DocumentSplitDisplay : MonoBehaviour
@@ -45,7 +43,7 @@ public class DocumentSplitDisplay : MonoBehaviour
             case DocumentType.IDCard:
                 controller.SetTitle("신분증");
                 controller.SetField("이름", data.fullName);
-                controller.SetField("생년월일", data.birthDate);
+                controller.SetField("생년월일", data.dateOfBirth);
                 controller.SetField("성별", data.gender);
                 break;
 
@@ -77,10 +75,15 @@ public class DocumentSplitDisplay : MonoBehaviour
         docRect.anchoredPosition = personArea.anchoredPosition;
 
         // 우선순위에 따라 문서 정렬 (낮을수록 위에 위치)
-        docRect.SetSiblingIndex(orderPriority); // ← 추가됨
+        docRect.SetSiblingIndex(orderPriority);
 
-        // 문서를 우측 책상 중앙으로 떨어뜨리는 애니메이션 실행
-        AnimateDropToDesk(0.3f);
+        // 문서 애니메이션 스크립트로 연출 위임
+        DocumentAnimation animation = docUI.GetComponent<DocumentAnimation>();
+        if (animation != null)
+        {
+            animation.targetRect = docRect;
+            animation.AnimateDropToDesk(0.3f);
+        }
 
         // 좌측에 축소 화면을 렌더링한 이미지 보여주기
         if (leftPreviewImage != null && miniDeskTexture != null)
@@ -91,51 +94,13 @@ public class DocumentSplitDisplay : MonoBehaviour
 
     public void AnimateGiveDocument(float duration = 0.5f)
     {
-        StartCoroutine(AnimateMoveToDesk(duration));
-    }
+        if (docUI == null) return;
 
-    private IEnumerator AnimateMoveToDesk(float duration)
-    {
-        RectTransform docRect = docUI.GetComponent<RectTransform>();
-        Vector2 from = personArea.anchoredPosition;
-        Vector2 to = Vector2.zero; // 우측 책상의 중심으로 이동
-
-        float timer = 0f;
-        while (timer < duration)
+        DocumentAnimation animation = docUI.GetComponent<DocumentAnimation>();
+        if (animation != null)
         {
-            timer += Time.deltaTime;
-            float t = Mathf.SmoothStep(0, 1, timer / duration);
-            docRect.anchoredPosition = Vector2.Lerp(from, to, t);
-            yield return null;
+            animation.targetRect = docUI.GetComponent<RectTransform>();
+            animation.AnimateGiveFrom(personArea.anchoredPosition, duration);
         }
-
-        docRect.anchoredPosition = to;
-    }
-
-    // 문서를 우측 중앙으로 슬라이드하는 애니메
-    public void AnimateDropToDesk(float duration = 0.3f)
-    {
-        StartCoroutine(DropToDeskAnimation(duration));
-    }
-
-    private IEnumerator DropToDeskAnimation(float duration)
-    {
-        RectTransform docRect = docUI.GetComponent<RectTransform>();
-
-        Vector2 targetPos = Vector2.zero;
-        Vector2 startPos = targetPos + new Vector2(0f, 300f);
-
-        docRect.anchoredPosition = startPos;
-
-        float timer = 0f;
-        while (timer < duration)
-        {
-            timer += Time.deltaTime;
-            float t = Mathf.SmoothStep(0, 1, timer / duration);
-            docRect.anchoredPosition = Vector2.Lerp(startPos, targetPos, t);
-            yield return null;
-        }
-
-        docRect.anchoredPosition = targetPos;
     }
 }

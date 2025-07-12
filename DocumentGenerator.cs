@@ -1,9 +1,15 @@
-// 문서를 무작위 또는 인물 기반으로 생성하고 Canvas에 분할된 UI로 문서를 띄움
-// PersonData를 기반으로 문서를 생성함
+// DocumentGenerator.cs
+// ----------------------------
+// 게임 내 문서를 생성하고 UI에 표시하는 제너레이터 스크립트
+// PersonData 또는 무작위 데이터를 기반으로 문서 3종(IDCard, BusinessPermit, Pass)을 생성
+// 생성된 문서는 확대/축소 UI로 표시되며, GameFlowManager에서 호출됨
 
-// GenerateRandomDocuments() = 무작위 문서 생성 테스트/디버그 용도
-// GenerateDocumentsForPerson = 실제 게임용으로. PersonData 입력 기반 문서 생성
-// CreateAndPlaceDocumentRandom, CreateAndPlaceDocumentFromPerson = 문서 생성 로직
+// 주요 메서드:
+// - GenerateDocumentsForPerson(PersonData): 인물 데이터를 기반으로 문서 UI 생성 (게임용)
+// - GenerateRandomDocuments(): 무작위 문서 3종을 생성 (디버그용)
+// - CreateDocumentUI(DocumentData, int): UI 프리팹을 생성하고 화면에 배치
+// - CreateAndPlaceDocumentFromPerson(): PersonData로 DocumentData 생성 후 UI 생성
+// - CreateAndPlaceDocumentRandom(): 랜덤 데이터로 문서 생성 후 UI 생성
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -39,13 +45,12 @@ public class DocumentGenerator : MonoBehaviour
     }
 
     // 게임용: 인물(PersonData)을 기반으로 문서를 생성하는 함수
-    public void GenerateDocumentsForPerson(PersonData data)
+    public GameObject GenerateDocumentsForPerson(PersonData data)
     {
         currentDocuments.Clear();
 
-        CreateAndPlaceDocumentFromPerson(data, DocumentType.IDCard, 0);
-        CreateAndPlaceDocumentFromPerson(data, DocumentType.BusinessPermit, 1);
-        CreateAndPlaceDocumentFromPerson(data, DocumentType.Pass, 2);
+        // ID카드를 기준 문서로 UI 애니메이션 연동
+        return CreateAndPlaceDocumentFromPerson(data, DocumentType.IDCard, 0);
     }
 
     // 랜덤 문서를 생성하고 배치하는 내부 함수
@@ -81,7 +86,7 @@ public class DocumentGenerator : MonoBehaviour
     }
 
     // 인물 정보를 기반으로 문서를 생성하고 배치하는 내부 함수
-    private void CreateAndPlaceDocumentFromPerson(PersonData data, DocumentType type, int index)
+    private GameObject CreateAndPlaceDocumentFromPerson(PersonData data, DocumentType type, int index)
     {
         DocumentData doc = new DocumentData {
             fullName = data.fullName,
@@ -109,13 +114,15 @@ public class DocumentGenerator : MonoBehaviour
                 break;
         }
 
-        CreateDocumentUI(doc, index);
+        return CreateDocumentUI(doc, index);
     }
 
     // 공통 UI 생성 로직 (문서 생성 + 애니메이션 처리)
-    private void CreateDocumentUI(DocumentData data, int index)
+    private GameObject CreateDocumentUI(DocumentData data, int index)
     {
         currentDocuments.Add(data);
+
+        GameObject doc = null;
 
         // --- 축소 화면용 문서 생성 ---
         if (compactDocumentPrefab != null && compactDocumentParent != null)
@@ -136,14 +143,21 @@ public class DocumentGenerator : MonoBehaviour
         // --- 확대 화면용 문서 생성 ---
         if (splitDisplayPrefab != null && expandedDocumentParent != null)
         {
-            GameObject doc = Instantiate(splitDisplayPrefab, expandedDocumentParent);
+            doc = Instantiate(splitDisplayPrefab, expandedDocumentParent);
+
+            DocumentUIController ui = doc.GetComponent<DocumentUIController>();
+            if (ui != null)
+                ui.SetData(data);
 
             DocumentSplitDisplay splitDisplay = doc.GetComponent<DocumentSplitDisplay>();
-            splitDisplay.orderPriority = index;
-
-            splitDisplay.InitializeDocument(data);
-            splitDisplay.AnimateGiveDocument();
+            if (splitDisplay != null)
+            {
+                splitDisplay.orderPriority = index;
+                splitDisplay.AnimateGiveDocument();
+            }
         }
+
+        return doc;
     }
 
     // 날짜를 무작위로 생성하는 도우미 함수
@@ -154,4 +168,4 @@ public class DocumentGenerator : MonoBehaviour
         int day = Random.Range(1, 28);
         return $"{year}.{month:00}.{day:00}";
     }
-} 
+}

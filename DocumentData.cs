@@ -1,7 +1,13 @@
-// 문서에 들어가는 데이터를 구조체처럼 보관. 한 사람의 정보를 하나의 단위로 다룸
-// 데이터를 저장하여 문서 생성, 인물 정보 매칭, 판단, 저장에 모두 활용
-// DocumentFactory에서 데이터를 받아 저장하고 DocumentGenerator에게 전달
-// InfoItem과는 다름. InfoLtem은 UI 클릭을 위해 만들어진 표현 포맷임
+// DocumentData.cs
+// ----------------------------
+// 문서 한 장에 들어가는 정보를 저장하는 데이터 클래스
+// PersonData로부터 파생되며, 문서 종류에 따라 필요한 항목만 포함됨
+// 문서 생성, 표시, 비교판별, 저장 등에 사용됨
+
+// 주요 필드:
+// - fullName, nationality, dateOfBirth, photo: 공통 문서 정보
+// - documentType: 문서 종류
+// - gender, address, businessType, departure, destination: 문서별 세부 정보
 
 using UnityEngine;
 
@@ -17,11 +23,10 @@ public class DocumentData
 {
     public string fullName;             // 이름
     public string nationality;          // 국적
-    public string dateOfBirth;          // 생년월일 (소문자로 수정)
+    public string dateOfBirth;          // 생년월일
     public Sprite photo;                // 사진
     public DocumentType documentType;   // 문서 종류
 
-    // 문서별 추가 필드
     public string gender;               // 성별 (IDCard, BusinessPermit)
     public string address;              // 주소 (IDCard)
     public string businessType;         // 업종 (BusinessPermit)
