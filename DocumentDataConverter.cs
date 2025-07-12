@@ -1,45 +1,49 @@
+// DocumentDataConverter.cs
+// ----------------------------
+// DocumentData의 비교를 위해 InfoItem으로 보내 UI화함.
+// DocumentUIController는 단순 표시용으로 이것과 성격이 다름
+// 문서 정보 → 지적 시스템에서 사용할 수 있도록 클릭 가능한 항목으로 변환함
+// UI 출력/판별 전용이며, 원본 문서 데이터를 손상시키지 않음
+
+// 주요 메서드:
+// - ToInfoItems(DocumentData, source): 문서 데이터를 항목별 InfoItem 리스트로 변환
+//  → 문서 종류에 따라 성별/주소/업종/출발지/도착지도 포함
+
 using System.Collections.Generic;
 using UnityEngine;
 
 public static class DocumentDataConverter
 {
-    // DocumentData → InfoItem 리스트
+    // DocumentData → InfoItem 리스트로 UI화
     public static List<InfoItem> ToInfoItems(DocumentData data, string source)
     {
-        List<InfoItem> items = new List<InfoItem>();
-
-        items.Add(new InfoItem("이름", data.fullName, source));
-        items.Add(new InfoItem("국적", data.nationality, source));
-        items.Add(new InfoItem("생년월일", data.dateOfBirth, source));
-        items.Add(new InfoItem("사진", data.photo != null ? data.photo.name : "없음", source));
-
-        return items;
-    }
-
-    // InfoItem 리스트 → DocumentData (역변환)
-    public static DocumentData ToDocumentData(List<InfoItem> items)
-    {
-        DocumentData data = new DocumentData();
-
-        foreach (var item in items)
+        List<InfoItem> items = new List<InfoItem>
         {
-            switch (item.label)
-            {
-                case "이름":
-                    data.fullName = item.value;
-                    break;
-                case "국적":
-                    data.nationality = item.value;
-                    break;
-                case "생년월일":
-                    data.dateOfBirth = item.value;
-                    break;
-                case "사진":
-                    // 사진은 복원이 어려워서 실제 게임에서 사용한다면, 이 부분은 따로 처리
-                    break;
-            }
+            new InfoItem("이름", data.fullName, source),
+            new InfoItem("국적", data.nationality, source),
+            new InfoItem("생년월일", data.dateOfBirth, source),
+            new InfoItem("사진", data.photo != null ? data.photo.name : "없음", source)
+        };
+
+        // 추후 문서 종류별 항목을 추가해야 함
+        switch (data.documentType)
+        {
+            case DocumentType.IDCard:
+                items.Add(new InfoItem("성별", data.gender, source));
+                items.Add(new InfoItem("주소", data.address, source));
+                break;
+
+            case DocumentType.BusinessPermit:
+                items.Add(new InfoItem("성별", data.gender, source));
+                items.Add(new InfoItem("업종", data.businessType, source));
+                break;
+
+            case DocumentType.Pass:
+                items.Add(new InfoItem("출발지", data.departure, source));
+                items.Add(new InfoItem("도착지", data.destination, source));
+                break;
         }
 
-        return data;
+        return items;
     }
 }
