@@ -1,8 +1,8 @@
-// 매뉴얼 관련 스크립트는 원하는 바가 다 구현되어 있음. 항목과 텍스트 채우는 거는 에디터에서 할 일임
-// 매뉴얼 UI 클릭 후 비교는 판단 매니저와 InfoItemUI 스크립트 관할
-
-// 현재 날짜를 기준으로 유효한 매뉴얼 항목 리스트를 가져오는 매니저 스크립트
-// ManualDatabase에서 현재 날짜까지의 항목들을 병합하여 반환함
+// ManualManager.cs
+// ----------------------------
+// ManualDatabase와 연결되어, 현재 날짜에 따라 유효한 매뉴얼 항목을 반환하는 관리 클래스
+// 게임 내에서 날짜를 기준으로 어떤 규칙(ManualEntry)이 활성 상태인지 판단할 수 있도록 도와줌
+// 판단 시스템, UI 출력, 규칙 비교 등에서 이 매니저를 통해 오늘의 규칙 목록을 획득
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,18 +33,3 @@ public class ManualManager : MonoBehaviour
         currentDay = day;
     }
 }
-
-
-// [Manual System 구조]
-
-// ManualEntry: 개별 항목 내의 설명 (ID, 제목, 내용, 이미지, 연동 키 포함)
-// DailyManualData: 특정 날짜의 항목 리스트 (예시 : N일에는 어떤 규칙들 삭제 추가)
-// ManualDatabase: 모든 날짜별 항목의 데이터 전체 저장. 항목별 덮어쓰기나 병합도 담당
-    // 같은 entryId는 덮어쓰기 → 최신 내용 유지
-    // 누적하고 싶으면 별도 병합 로직 필요
-// ManualManager: 현재 날짜 기준으로 유효 항목을 정리해 UI나 판단 매니저가 사용 가능하게 함
-
-// [향후 구현 필요]
-// - UI에 항목 목록 → 클릭 → 상세 페이지 → 뒤로가기 흐름
-// - 누적 텍스트 병합 옵션
-// - logicKey 기반 필터링 또는 연동 기능 추가

@@ -1,7 +1,9 @@
-// 날짜별로 구성된 여러 DailyManualData를 저장함
-// 특정 날짜까지의 모든 매뉴얼 항목을 병합해서 반환하는 기능을 제공함
-// 같은 entryId를 가진 항목은 새로운 내용으로 덮어씌움
-// EX) 2일차의 내용은 1일차의 내용을 포함하도록 함
+// ManualDatabase.cs
+// ----------------------------
+// 날짜별로 구성된 매뉴얼 항목(DailyManualData 리스트)을 관리하는 데이터베이스
+// 특정 날짜까지의 모든 매뉴얼 항목을 병합하여 반환하는 기능을 제공
+// 같은 entryId를 가진 항목은 나중 날짜의 항목으로 덮어써서 최신 정보만 유지
+// ScriptableObject로 관리되며 에디터에서 항목 입력 및 편집 가능
 
 using System.Collections.Generic;
 using UnityEngine;

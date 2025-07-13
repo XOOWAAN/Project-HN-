@@ -1,4 +1,9 @@
-// 매뉴얼 UI 항목 리스트 → 상세보기 → 뒤로가기 흐름 구현
+// ManualUIController.cs
+// ----------------------------
+// 매뉴얼 항목을 UI에 표시하고, 상세 정보 보기 및 뒤로가기 기능을 제공하는 컨트롤러
+// 리스트 형태로 모든 규칙 제목을 보여주며, 클릭 시 상세 설명과 이미지가 출력됨
+// ManualManager에서 가져온 매뉴얼 데이터를 시각적으로 유저에게 노출하는 역할
+// 스크롤뷰, 버튼, 텍스트 UI 요소를 연결하여 구성됨
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -67,15 +72,3 @@ public class ManualUIController : MonoBehaviour
         detailPanel.SetActive(false);
     }
 }
-
-[유니티 에디터에서의 요소 연결 방법]
-// ManualUIController
-// ├── ListPanel
-// │   └── ScrollView
-// │       └── Viewport
-// │           └── Content  ← entryListParent 연결
-// ├── DetailPanel
-// │   ├── TitleText        ← detailTitleText 연결
-// │   ├── ContentText      ← detailContentText 연결
-// │   ├── Image            ← detailImage 연결
-// │   └── BackButton       ← OnBackToList() 연결
