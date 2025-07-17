@@ -5,7 +5,7 @@
 // 생성된 문서는 확대/축소 UI로 표시되며, GameFlowManager에서 호출됨
 
 // 주요 메서드:
-// - GenerateDocumentsForPerson(PersonData): 인물 데이터를 기반으로 문서 UI 생성 (게임용)
+// - GenerateDocumentsForPerson(PersonData): 인물과 일자별 생성 가능 문서 기반으로 문서 생성 (게임용)
 // - GenerateRandomDocuments(): 무작위 문서 3종을 생성 (디버그용)
 // - CreateDocumentUI(DocumentData, int): UI 프리팹을 생성하고 화면에 배치
 // - CreateAndPlaceDocumentFromPerson(): PersonData로 DocumentData 생성 후 UI 생성
@@ -32,6 +32,9 @@ public class DocumentGenerator : MonoBehaviour
     public List<string> nationalities;
     public List<Sprite> photos;
 
+    [Header("게임 진행 상태")]
+    public int currentDay = 1; // GameFlowManager나 ManualManager에서 받아올 수 있음
+
     private List<DocumentData> currentDocuments = new List<DocumentData>();
 
     // 무작위 문서를 생성하는 테스트용 함수
@@ -44,13 +47,25 @@ public class DocumentGenerator : MonoBehaviour
         CreateAndPlaceDocumentRandom(DocumentType.Pass, 2);
     }
 
-    // 게임용: 인물(PersonData)을 기반으로 문서를 생성하는 함수
+    // 게임용: 인물과 일자별 생성 가능 문서 기반으로 문서 생성
     public GameObject GenerateDocumentsForPerson(PersonData data)
     {
         currentDocuments.Clear();
+        GameObject firstDoc = null;
 
-        // ID카드를 기준 문서로 UI 애니메이션 연동
-        return CreateAndPlaceDocumentFromPerson(data, DocumentType.IDCard, 0);
+        // IDCard는 1일차부터
+        if (currentDay >= 1)
+            firstDoc = CreateAndPlaceDocumentFromPerson(data, DocumentType.IDCard, 0);
+
+        // 2일차부터 BusinessPermit도 생성 가능
+        if (currentDay >= 2)
+            CreateAndPlaceDocumentFromPerson(data, DocumentType.BusinessPermit, 1);
+
+        // 3일차부터 Pass도 생성 가능
+        if (currentDay >= 3)
+            CreateAndPlaceDocumentFromPerson(data, DocumentType.Pass, 2);
+
+        return firstDoc;
     }
 
     // 랜덤 문서를 생성하고 배치하는 내부 함수

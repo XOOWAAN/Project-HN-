@@ -13,8 +13,6 @@ public class ManualDatabase : ScriptableObject
 {
     public List<DailyManualData> dailyManuals;  // 날짜별로 저장된 매뉴얼 데이터 목록
 
-    // 특정 날짜까지의 매뉴얼 항목을 병합하여 반환
-    // entryId를 기준으로 이전 내용은 덮어쓰거나 누적
     public List<ManualEntry> GetMergedManualEntriesUpToDay(int day)
     {
         Dictionary<string, ManualEntry> entryDict = new();
@@ -27,16 +25,13 @@ public class ManualDatabase : ScriptableObject
             {
                 if (entryDict.ContainsKey(entry.entryId))
                 {
-                    // 텍스트 누적
                     entryDict[entry.entryId].content += "\n" + entry.content;
-
-                    // 이미지가 있다면 교체
                     if (entry.image != null)
                         entryDict[entry.entryId].image = entry.image;
+                    entryDict[entry.entryId].logicKey = entry.logicKey;
                 }
                 else
                 {
-                    // 새 항목 추가
                     entryDict[entry.entryId] = new ManualEntry
                     {
                         entryId = entry.entryId,

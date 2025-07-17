@@ -55,6 +55,9 @@ public class GameFlowManager : MonoBehaviour
         // 2. 문서 생성
         GameObject docUI = documentGenerator.GenerateDocumentsForPerson(currentPerson);
 
+        // 문서 생성 후 currentDocuments를 JudgeManager로 전달(문서 판단 위함)
+        JudgeManager.Instance.CheckForbiddenDocuments(documentGenerator.CurrentDocuments);
+
         // 3. 애니메이션 할당 및 재생
         currentAnim = currentCharacter.GetComponent<DocPersonAnimation>();
         if (currentAnim != null && docUI != null)
