@@ -10,6 +10,8 @@
 // - HandleNextPerson(): 인물 생성, 문서 생성, 애니메이션 재생, 처리 버튼 제어까지 담당
 // - OnProcessComplete(): 플레이어가 처리 완료 버튼을 눌렀을 때 호출됨
 
+// ⚠️현재 대사 출력 후 처리 버튼이 활성화되는데, 추후 구조 변경되면 이 부분도 바꿔야 함⚠️
+
 using UnityEngine;
 using System.Collections;
 using TMPro;
