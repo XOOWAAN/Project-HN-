@@ -1,18 +1,23 @@
-// InfoItem 데이터를 실제로 화면에 표시, 클릭할 수 있게 만드는 UI 컴포넌트
-// 예: 주민등록증의 이름, 생년월일 등 개별 항목을 표시하고 선택 가능하게 함
+// InfoItemUI.cs
+// ------------------------------------
+// InfoItem 데이터를 UI로 표시하고, 클릭 시 JudgeManager에 전달하는 통합 컴포넌트
+// 문서·인물·매뉴얼 등 모든 항목을 InfoItem 데이터로 변환하여 이 스크립트를 통해 클릭 가능하게 함
+// Initialize()를 통해 라벨/값/UI를 세팅하고 클릭 이벤트를 등록
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
-public class InfoItemUI : MonoBehaviour
+public class InfoItemUI : MonoBehaviour, IPointerClickHandler
 {
+    [Header("UI References")]
     [SerializeField] private TextMeshProUGUI labelText;   // 항목 이름 텍스트
     [SerializeField] private TextMeshProUGUI valueText;   // 항목 값 텍스트
-    [SerializeField] private Button button;               // 항목 클릭 버튼
+    [SerializeField] private Button button;               // (선택사항) 버튼을 통한 클릭
 
-    private JudgeManager judgeManager; // 변경: 통합 판단 매니저 사용
-    private JudgeManager.InfoItem item; // 변경: InfoItem 타입도 JudgeManager 기준으로
+    private JudgeManager judgeManager;
+    private JudgeManager.InfoItem item;
 
     // InfoItem 데이터를 받아 UI 구성 및 클릭 이벤트 연결
     public void Initialize(JudgeManager.InfoItem item, JudgeManager judgeManager)
@@ -26,16 +31,36 @@ public class InfoItemUI : MonoBehaviour
         if (valueText != null)
             valueText.text = item.value;
 
+        // 버튼이 있을 경우에도 클릭 이벤트 연결
         if (button != null)
         {
-            button.onClick.RemoveAllListeners(); // 중복 연결 방지
+            button.onClick.RemoveAllListeners();
             button.onClick.AddListener(OnClick);
         }
     }
 
-    // 버튼 클릭 시 항목 선택을 판단 매니저에 전달
+    // 버튼을 통한 클릭 처리
     private void OnClick()
     {
+        HandleClick();
+    }
+
+    // IPointerClickHandler를 통한 클릭 처리
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        HandleClick();
+    }
+
+    // JudgeManager로 InfoItem 전달 및 비교 결과 출력
+    private void HandleClick()
+    {
+        if (judgeManager == null)
+        {
+            judgeManager = JudgeManager.Instance; // 싱글톤 접근 (에디터에서 직접 세팅 안 한 경우)
+        }
+
+        if (judgeManager == null) return;
+
         judgeManager.SelectItem(item);
 
         if (judgeManager.HasSelectedTwoItems())
